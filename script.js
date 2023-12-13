@@ -48,16 +48,16 @@ speedSlider.addEventListener("input", function () {
 function generateRectangles(rectangles, selectedIndex, maxIndex) {
   // Clear existing rectangles
   arrayContent.innerHTML = "";
-  const width = (arrayContent.offsetWidth)/(rectangles.length * 1.5);
+  const width = (arrayContent.offsetWidth)/((rectangles.length+1) * 5);
   for (let i = 0; i < rectangles.length; i++) {
     const rectangle = document.createElement("div");
     rectangle.classList.add("rectangle");
     rectangle.style.width = `${width}px`;
     rectangle.style.height = `${rectangles[i]}px`
     if (i === maxIndex) {
-      rectangle.style.backgroundColor = "red";
+      rectangle.style.background = "red";
     } else if (i === selectedIndex) {
-      rectangle.style.backgroundColor = "green";
+      rectangle.style.background = "green";
     }
     arrayContent.appendChild(rectangle);
   }
@@ -97,6 +97,7 @@ async function sortArray() {
     moveElementToEnd(currentArray, currMaxIndex);
     generateRectangles(currentArray, -1, currentArray.length-1);
   }
+  sorting = false;
 }
 
 function moveElementToEnd(array, index) {
