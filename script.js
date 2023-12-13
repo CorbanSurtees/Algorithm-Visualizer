@@ -1,11 +1,15 @@
 const arrayContent = document.getElementById("arrayContent");
-const slider = document.getElementById("rectangleSlider");
-const sliderValueLabel = document.getElementById("sliderValue");
+const lengthSlider = document.getElementById("rectangleSlider");
+const lengthSliderValueLabel = document.getElementById("rectangleSliderValue");
 const sortButton = document.getElementById("sortButton");
 const automateCheckbox = document.getElementById("automateAlgorithm");
+const speedSlider = document.getElementById("speedSlider");
+const speedSliderValueLabel = document.getElementById("speedSliderValue");
+
 
 var currentArray = [];
 var sorting = false;
+automatic = false;
 
 document.addEventListener("DOMContentLoaded", function () {
   currentArray = generateRandomArray(10);
@@ -13,10 +17,10 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Update rectangles when slider value changes
-slider.addEventListener("input", function () {
+lengthSlider.addEventListener("input", function () {
   sorting = false;
-  const rectangleCount = slider.value;
-  sliderValueLabel.textContent = rectangleCount;
+  const rectangleCount = lengthSlider.value;
+  lengthSliderValueLabel.textContent = rectangleCount;
   currentArray = generateRandomArray(rectangleCount)
   generateRectangles(currentArray)
 });
@@ -25,6 +29,18 @@ slider.addEventListener("input", function () {
 sortButton.addEventListener("click", function () {
   if (!sorting) {
     sortArray();
+  }
+});
+
+// Update speed when slider value changes
+speedSlider.addEventListener("input", function () {
+  const speed = speedSlider.value;
+  if (speed === speedSlider.max) {
+    speedSliderValueLabel.textContent = "Max";
+  } else if (speed === speedSlider.min) {
+    speedSliderValueLabel.textContent = "Min";
+  } else {
+    speedSliderValueLabel.textContent = speed;
   }
 });
 
@@ -60,11 +76,7 @@ function generateRandomArray(length) {
 async function sortArray() {
   sorting = true;
   for (let j = 0; j < currentArray.length; j++) {
-    if (!automateCheckbox.checked) {
-      await waitForUserClick();
-    } else {
-      await delay(100)
-    }
+    await pause();
     currMax = 0;
     currMaxIndex = 0;
     for (let i = 0; i < currentArray.length-j; i++) {
@@ -73,11 +85,7 @@ async function sortArray() {
         currMaxIndex = i;
       }
       generateRectangles(currentArray, i, currMaxIndex);
-      if (!automateCheckbox.checked) {
-        await waitForUserClick();
-      } else {
-        await delay(100)
-      }
+      await pause()
       if (!sorting) {
         return;
       }
@@ -85,11 +93,7 @@ async function sortArray() {
     }
   
     generateRectangles(currentArray, -1, currMaxIndex);
-    if (!automateCheckbox.checked) {
-      await waitForUserClick();
-    } else {
-      await delay(100)
-    }
+    await pause()
     moveElementToEnd(currentArray, currMaxIndex);
     generateRectangles(currentArray, -1, currentArray.length-1);
   }
@@ -104,11 +108,18 @@ function moveElementToEnd(array, index) {
   }
 }
 
-function pauseFor(timeInMilliseconds) {
-  console.log("paused")
-  const start = Date.now();
-  while (Date.now() - start < timeInMilliseconds) {
-    // Keep the loop running until the specified time has passed
+async function pause() {
+  automatic = true;
+  if (speedSlider.value === speedSlider.max) {
+    return;
+  }
+  if (speedSlider.value === speedSlider.min) {
+    automatic = false;
+  }
+  if (!automatic) {
+    await waitForUserClick();
+  } else {
+    await delay(speedSlider.max - speedSlider.value)
   }
 }
 
