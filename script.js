@@ -28,7 +28,8 @@ lengthSlider.addEventListener("input", function () {
 // Event listener for the "Sort" button
 sortButton.addEventListener("click", function () {
   if (!sorting) {
-    sortArray();
+    // selectionSort();
+    bubbleSort();
   }
 });
 
@@ -45,7 +46,7 @@ speedSlider.addEventListener("input", function () {
 });
 
 
-function generateRectangles(rectangles, selectedIndex, maxIndex) {
+function generateRectangles(rectangles, green=[], red=[]) {
   // Clear existing rectangles
   arrayContent.innerHTML = "";
   const width = (arrayContent.offsetWidth)/((rectangles.length+1) * 5);
@@ -54,9 +55,9 @@ function generateRectangles(rectangles, selectedIndex, maxIndex) {
     rectangle.classList.add("rectangle");
     rectangle.style.width = `${width}px`;
     rectangle.style.height = `${rectangles[i]}px`
-    if (i === maxIndex) {
+    if (red.includes(i)) {
       rectangle.style.background = "red";
-    } else if (i === selectedIndex) {
+    } else if (green.includes(i)) {
       rectangle.style.background = "green";
     }
     arrayContent.appendChild(rectangle);
@@ -73,7 +74,7 @@ function generateRandomArray(length) {
   return randomArray;
 }
 
-async function sortArray() {
+async function selectionSort() {
   sorting = true;
   for (let j = 0; j < currentArray.length; j++) {
     await pause();
@@ -84,7 +85,7 @@ async function sortArray() {
         currMax = currentArray[i]
         currMaxIndex = i;
       }
-      generateRectangles(currentArray, i, currMaxIndex);
+      generateRectangles(currentArray, [i], [currMaxIndex]);
       await pause()
       if (!sorting) {
         return;
@@ -92,20 +93,39 @@ async function sortArray() {
 
     }
   
-    generateRectangles(currentArray, -1, currMaxIndex);
+    generateRectangles(currentArray, [-1], [currMaxIndex]);
     await pause()
-    moveElementToEnd(currentArray, currMaxIndex);
-    generateRectangles(currentArray, -1, currentArray.length-1);
+    swap(currentArray, currMaxIndex, currentArray.length-j-1);
+    generateRectangles(currentArray, [-1], [currentArray.length-j-1]);~
   }
   sorting = false;
 }
 
-function moveElementToEnd(array, index) {
-  if (index >= 0 && index < array.length) {
-      const elementToMove = array.splice(index, 1)[0];
-      array.push(elementToMove);
+async function bubbleSort() {
+  for (let i = 0; i < currentArray.length; i++) {
+    for (let j = 0; j < currentArray.length-i-1; j++) {
+      generateRectangles(currentArray, [j, j+1])
+      await pause();
+      if(currentArray[j] > currentArray[j+1]) {
+        console.log(j + " : " + (j+1))
+        swap(currentArray, j, j+1);
+        generateRectangles(currentArray, [], [j, j+1])
+        console.log("gonna wait?")
+        await pause();
+        console.log("idk")
+      }
+    }
+  }
+  generateRectangles(currentArray);
+}
+
+function swap(array, a, b) {
+  if (a >= 0 && a < array.length && b >= 0 && b< array.length) {
+    var t = array[a];
+    array[a] = array[b];
+    array[b] = t;
   } else {
-      console.error("Invalid index");
+    console.error("Invalid index");
   }
 }
 
