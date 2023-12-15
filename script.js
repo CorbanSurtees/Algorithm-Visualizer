@@ -28,8 +28,8 @@ lengthSlider.addEventListener("input", function () {
 // Event listener for the "Sort" button
 sortButton.addEventListener("click", function () {
   if (!sorting) {
-    // selectionSort();
-    bubbleSort();
+    selectionSort();
+    // bubbleSort();
   }
 });
 
@@ -57,8 +57,10 @@ function generateRectangles(rectangles, green=[], red=[]) {
     rectangle.style.height = `${rectangles[i]}px`
     if (red.includes(i)) {
       rectangle.style.background = "red";
+      rectangle.style.borderColor = "red"
     } else if (green.includes(i)) {
       rectangle.style.background = "green";
+      rectangle.style.borderColor = "green"
     }
     arrayContent.appendChild(rectangle);
   }
@@ -96,7 +98,11 @@ async function selectionSort() {
     generateRectangles(currentArray, [-1], [currMaxIndex]);
     await pause()
     swap(currentArray, currMaxIndex, currentArray.length-j-1);
-    generateRectangles(currentArray, [-1], [currentArray.length-j-1]);~
+    generateRectangles(currentArray, [-1], [currentArray.length-j-1]);
+  }
+  for (let i = 1; i <= currentArray.length; i++) {
+    generateRectangles(currentArray,  Array.from({ length: i }, (_, index) => index), []);
+    await delay(speedSlider.max - speedSlider.value)
   }
   sorting = false;
 }
@@ -110,9 +116,7 @@ async function bubbleSort() {
         console.log(j + " : " + (j+1))
         swap(currentArray, j, j+1);
         generateRectangles(currentArray, [], [j, j+1])
-        console.log("gonna wait?")
         await pause();
-        console.log("idk")
       }
     }
   }
